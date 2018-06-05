@@ -5,6 +5,7 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Header</Filter>
     </ClCompile>
+    <ClCompile Include="FrameWork.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameClient.h" />
@@ -20,6 +21,7 @@
     <ClInclude Include="..\..\protocol.h">
       <Filter>Header</Filter>
     </ClInclude>
+    <ClInclude Include="FrameWork.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="GameClient.rc" />

@@ -1,0 +1,7 @@
+﻿  stdafx.cpp
+c:\users\punch\desktop\work\server\과제\gameclient\gameclient\stdafx.h(38): error C2011: 'Packet': 'struct' 형식 재정의
+  c:\users\punch\desktop\work\server\과제\protocol.h(22): note: 'Packet' 선언을 참조하십시오.
+c:\users\punch\desktop\work\server\과제\gameclient\gameclient\stdafx.h(51): error C2011: 'Data': 'struct' 형식 재정의
+  c:\users\punch\desktop\work\server\과제\protocol.h(36): note: 'Data' 선언을 참조하십시오.
+c:\users\punch\desktop\work\server\과제\gameclient\gameclient\stdafx.h(62): error C2011: 'Packet_t': 'struct' 형식 재정의
+  c:\users\punch\desktop\work\server\과제\protocol.h(47): note: 'Packet_t' 선언을 참조하십시오.
