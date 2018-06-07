@@ -26,7 +26,7 @@ void FrameWork::Initialize()
 	ZeroMemory(&ServerAddr, sizeof(SOCKADDR_IN));
 	ServerAddr.sin_family = AF_INET;
 	ServerAddr.sin_port = htons(SERVER_PORT);
-	ServerAddr.sin_addr.s_addr = inet_addr("127.0.0.1");
+	inet_pton(AF_INET, "127.0.0.1", &ServerAddr.sin_addr.s_addr);
 
 	int Result = WSAConnect(g_mysocket, (sockaddr *)&ServerAddr, sizeof(ServerAddr), NULL, NULL, NULL, NULL);
 
@@ -36,6 +36,17 @@ void FrameWork::Initialize()
 	send_wsabuf.len = BUF_SIZE;
 	recv_wsabuf.buf = recv_buffer;
 	recv_wsabuf.len = BUF_SIZE;
+
+	//
+	for (int i = 0; i < MAX_USER; ++i)
+	{
+		other[i].id = i;
+		if (i == id) continue;
+
+		other[i].is_use = false;
+		other[i].pos.x = rand() % BOARD_WIDTH;
+		other[i].pos.y = rand() % BOARD_HEIGHT;
+	}
 }
 void FrameWork::Release()
 {
@@ -45,6 +56,27 @@ void FrameWork::Release()
 
 void FrameWork::Draw(HDC * memdc)
 {
+	HBRUSH CharBrush;
+	HBRUSH myBrush;
+
+	CharBrush = CreateSolidBrush(RGB(20, 20, 20));
+	myBrush = (HBRUSH)SelectObject(*memdc, CharBrush);
+	
+
+	for (int i = 0; i < MAX_USER; ++i) {
+		if(other[i].is_use == false)
+			Ellipse(*memdc, other[i].pos.x-OTHER_SIZE, other[i].pos.y- OTHER_SIZE,
+				other[i].pos.x+ OTHER_SIZE, other[i].pos.y+ OTHER_SIZE);
+	}
+	Ellipse(*memdc, pos.x+MY_SIZE, pos.y+ MY_SIZE, pos.x- MY_SIZE, pos.y- MY_SIZE);
+
+
+	SelectObject(*memdc, myBrush);
+	DeleteObject(CharBrush);
+
+	//for (int i = 0; i < g_divide; ++i)
+	//		bit_character.TransparentBlt(MemDC, g_ppacket[i].data.x, g_ppacket[i].data.y,
+	//			g_ppacket[i].data.size_x, g_ppacket[i].data.size_y, RGB(0, 0, 0));
 }
 
 //
@@ -52,6 +84,10 @@ void FrameWork::Draw(HDC * memdc)
 /*		////////////////////////////////////////////////////////		*/	
 //
 
+
+void FrameWork::ProcessPacket(char *)
+{
+}
 
 void FrameWork::ReadPacket(SOCKET sock)
 {
@@ -83,35 +119,155 @@ void FrameWork::ReadPacket(SOCKET sock)
 	}
 }
 
-void FrameWork::KeyboardProcess(WPARAM wparam)
+
+
+
+
+void FrameWork::BackGroundProcess(RECT ** board)
 {
-	switch (wparam)
+	float minX, maxX;
+	float minY, maxY;
+	minX = WIN_WIDTH * 0.5f;		maxX = BOARD_WIDTH - WIN_WIDTH * 0.5f;
+	minY = WIN_HEIGHT * 0.5f;		maxY = BOARD_HEIGHT - WIN_HEIGHT * 0.5f;
+
+	switch (dir)
 	{
-	case VK_RIGHT:
-		if (g_ppacket[g_serialNum - 1].type)
-			g_data.data.dir = CharDir::right;
+	case CharDir::right:
+		if (minX < pos.x) {
+			if (board[0][BOARD_COUNT-1].right > WIN_WIDTH-100)
+			{
+				speed = 0;
+				board_speed = 10;
+				for (int i = 0; i < BOARD_COUNT; ++i) {
+					for (int j = 0; j < BOARD_COUNT; ++j) {
+						board[i][j].left -= board_speed;
+						board[i][j].right -= board_speed;
+					}
+				}
+				for (int i = 0; i < MAX_USER; ++i)
+					if (other[i].is_use == false)
+						other[i].pos.x -= board_speed;
+			}
+			else {
+				speed = 10;
+				board_speed = 0;
+			}
+		}
+		else {
+			speed = 10;
+			board_speed = 0;
+		}
 		break;
-	case VK_LEFT:
-		if (g_ppacket[g_serialNum - 1].type)
-			g_data.data.dir = CharDir::left;
+	case CharDir::left:
+		if (minX > pos.x) {
+			if (board[0][0].left < 100)
+			{
+				speed = 0;
+				board_speed = 10;
+				for (int i = 0; i < BOARD_COUNT; ++i) {
+					for (int j = 0; j < BOARD_COUNT; ++j) {
+						board[i][j].left += board_speed;
+						board[i][j].right += board_speed;
+					}
+				}
+				for (int i = 0; i < MAX_USER; ++i)
+					if (other[i].is_use == false)
+						other[i].pos.x += board_speed;
+			}
+			else {
+				speed = 10;
+				board_speed = 0;
+			}
+		}
+		else {
+			speed = 10;
+			board_speed = 0;
+		}
 		break;
-	case VK_UP:
-		if (g_ppacket[g_serialNum - 1].type)
-			g_data.data.dir = CharDir::up;
+	case CharDir::up:
+		if (minY > pos.y) {
+			if (board[0][0].top < 100)
+			{
+				speed = 0;
+				board_speed = 10;
+				for (int i = 0; i < BOARD_COUNT; ++i) {
+					for (int j = 0; j < BOARD_COUNT; ++j) {
+						board[i][j].top += board_speed;
+						board[i][j].bottom += board_speed;
+					}
+				}
+				for (int i = 0; i < MAX_USER; ++i)
+					if (other[i].is_use == false)
+						other[i].pos.y += board_speed;
+			}
+			else {
+				speed = 10;
+				board_speed = 0;
+			}
+		}
+		else {
+			speed = 10;
+			board_speed = 0;
+		}
 		break;
-	case VK_DOWN:
-		if (g_ppacket[g_serialNum - 1].type)
-			g_data.data.dir = CharDir::down;
+	case CharDir::down:
+		if (minY < pos.y) {
+			if (board[BOARD_COUNT - 1][0].bottom > WIN_HEIGHT - 100)
+			{
+				speed = 0;
+				board_speed = 10;
+				for (int i = 0; i < BOARD_COUNT; ++i) {
+					for (int j = 0; j < BOARD_COUNT; ++j) {
+						board[i][j].top -= board_speed;
+						board[i][j].bottom -= board_speed;
+					}
+				}
+				for (int i = 0; i < MAX_USER; ++i)
+					if (other[i].is_use == false)
+						other[i].pos.y -= board_speed;
+			}
+			else {
+				speed = 10;
+				board_speed = 0;
+			}
+		}
+		else {
+			speed = 10;
+			board_speed = 0;
+		}
+		break;
+	default:
 		break;
 	}
 }
 
 //////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
-
-
-
-
+void FrameWork::KeyboardDownProcess(WPARAM wparam)
+{
+	switch (wparam)
+	{
+	case VK_RIGHT:
+		pos.x+=speed;
+		dir = CharDir::right;
+		break;
+	case VK_LEFT:
+		pos.x-=speed;
+		dir = CharDir::left;
+		break;
+	case VK_UP:
+		pos.y-= speed;
+		dir = CharDir::up;
+		break;
+	case VK_DOWN:
+		pos.y+= speed;
+		dir = CharDir::down;
+		break;
+	default:
+		dir = CharDir::stay;
+		break;
+	}
+}
 
 
 
