@@ -85,10 +85,76 @@ void FrameWork::Draw(HDC * memdc)
 //
 
 
-void FrameWork::ProcessPacket(char *)
+void ProcessPacket(char *ptr)
 {
+	//static bool first_time = true;
+	//switch (ptr[1])
+	//{
+	//case SC_PUT_PLAYER:
+	//{
+	//	sc_packet_put_player *my_packet = reinterpret_cast<sc_packet_put_player *>(ptr);
+	//	int id = my_packet->id;
+	//	if (first_time) {
+	//		first_time = false;
+	//		g_myid = id;
+	//	}
+	//	if (id == g_myid) {
+	//		player.x = my_packet->x;
+	//		player.y = my_packet->y;
+	//		player.attr |= BOB_ATTR_VISIBLE;
+	//	}
+	//	else if (id < NPC_START) {
+	//		skelaton[id].x = my_packet->x;
+	//		skelaton[id].y = my_packet->y;
+	//		skelaton[id].attr |= BOB_ATTR_VISIBLE;
+	//	}
+	//	else {
+	//		npc[id - NPC_START].x = my_packet->x;
+	//		npc[id - NPC_START].y = my_packet->y;
+	//		npc[id - NPC_START].attr |= BOB_ATTR_VISIBLE;
+	//	}
+	//	break;
+	//}
+	//case SC_POS:
+	//{
+	//	sc_packet_pos *my_packet = reinterpret_cast<sc_packet_pos *>(ptr);
+	//	int other_id = my_packet->id;
+	//	if (other_id == g_myid) {
+	//		g_left_x = my_packet->x - 8;
+	//		g_top_y = my_packet->y - 8;
+	//		player.x = my_packet->x;
+	//		player.y = my_packet->y;
+	//	}
+	//	else if (other_id < NPC_START) {
+	//		skelaton[other_id].x = my_packet->x;
+	//		skelaton[other_id].y = my_packet->y;
+	//	}
+	//	else {
+	//		npc[other_id - NPC_START].x = my_packet->x;
+	//		npc[other_id - NPC_START].y = my_packet->y;
+	//	}
+	//	break;
+	//}
+	//
+	//case SC_REMOVE_PLAYER:
+	//{
+	//	sc_packet_remove_player *my_packet = reinterpret_cast<sc_packet_remove_player *>(ptr);
+	//	int other_id = my_packet->id;
+	//	if (other_id == g_myid) {
+	//		player.attr &= ~BOB_ATTR_VISIBLE;
+	//	}
+	//	else if (other_id < NPC_START) {
+	//		skelaton[other_id].attr &= ~BOB_ATTR_VISIBLE;
+	//	}
+	//	else {
+	//		npc[other_id - NPC_START].attr &= ~BOB_ATTR_VISIBLE;
+	//	}
+	//	break;
+	//}
+	//default:
+	//	printf("Unknown PACKET type [%d]\n", ptr[1]);
+	//}
 }
-
 void FrameWork::ReadPacket(SOCKET sock)
 {
 	DWORD iobyte, ioflag = 0;
@@ -134,7 +200,7 @@ void FrameWork::BackGroundProcess(RECT ** board)
 	{
 	case CharDir::right:
 		if (minX < pos.x) {
-			if (board[0][BOARD_COUNT-1].right > WIN_WIDTH-100)
+			if (board[0][BOARD_COUNT-1].right > WIN_WIDTH)
 			{
 				speed = 0;
 				board_speed = 10;
@@ -160,7 +226,7 @@ void FrameWork::BackGroundProcess(RECT ** board)
 		break;
 	case CharDir::left:
 		if (minX > pos.x) {
-			if (board[0][0].left < 100)
+			if (board[0][0].left < 0)
 			{
 				speed = 0;
 				board_speed = 10;
@@ -186,7 +252,7 @@ void FrameWork::BackGroundProcess(RECT ** board)
 		break;
 	case CharDir::up:
 		if (minY > pos.y) {
-			if (board[0][0].top < 100)
+			if (board[0][0].top < 0)
 			{
 				speed = 0;
 				board_speed = 10;
@@ -212,7 +278,7 @@ void FrameWork::BackGroundProcess(RECT ** board)
 		break;
 	case CharDir::down:
 		if (minY < pos.y) {
-			if (board[BOARD_COUNT - 1][0].bottom > WIN_HEIGHT - 100)
+			if (board[BOARD_COUNT - 1][0].bottom > WIN_HEIGHT)
 			{
 				speed = 0;
 				board_speed = 10;
@@ -248,19 +314,19 @@ void FrameWork::KeyboardDownProcess(WPARAM wparam)
 	switch (wparam)
 	{
 	case VK_RIGHT:
-		pos.x+=speed;
+		if(pos.x < WIN_WIDTH) pos.x+=speed;
 		dir = CharDir::right;
 		break;
 	case VK_LEFT:
-		pos.x-=speed;
+		if (pos.x > 0)pos.x-=speed;
 		dir = CharDir::left;
 		break;
 	case VK_UP:
-		pos.y-= speed;
+		if (pos.y > 0)pos.y-= speed;
 		dir = CharDir::up;
 		break;
 	case VK_DOWN:
-		pos.y+= speed;
+		if (pos.y < WIN_HEIGHT)pos.y+= speed;
 		dir = CharDir::down;
 		break;
 	default:

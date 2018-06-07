@@ -11,7 +11,6 @@
 #define	WM_SOCKET				WM_USER + 1
 
 
-
 class FrameWork
 {
 	HINSTANCE main_hInstance;

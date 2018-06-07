@@ -6,6 +6,7 @@
 #define SERVERPORT 9000
 
 #define MAX_STR_SIZE  100
+#define DEVIDE
 
 #define CS_UP    1
 #define CS_DOWN  2
