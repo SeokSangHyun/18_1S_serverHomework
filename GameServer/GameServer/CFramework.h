@@ -2,54 +2,59 @@
 
 #include "stdafx.h"
 
+struct EXOVER {
+	WSAOVERLAPPED m_over;
+	char m_iobuf[MAX_BUFF_SIZE];
+	WSABUF m_wsabuf;
+	char event_type;
+};
 
 
-//클라이언트( cl )에 packet의 정보를 보냄.
-static void SendPacket(int cl, void *packet) {
-	ExOver *o = new ExOver;
-	char *p = reinterpret_cast<char *>(packet);
-	memcpy(o->io_buffer, packet, p[0]);
-	o->is_recv = false;
-	o->wsabuf.buf = o->io_buffer;
-	o->wsabuf.len = p[0];
-	ZeroMemory(&o->wsaover, sizeof(WSAOVERLAPPED));
+class Client {
+public:
+	SOCKET m_s;
+	bool m_isconnected;
+	int m_x;
+	int m_y;
+	bool m_isactive;
+	WORD Id;
 
-	int ret = WSASend(g_clients[cl].s, &o->wsabuf, 1, NULL, 0, &o->wsaover, NULL);
+	unordered_set <int> m_viewlist;
+	mutex m_mvl;
 
-	if (0 != ret)
+	EXOVER m_rxover;
+	int m_packet_size;  // 지금 조립하고 있는 패킷의 크기
+	int	m_prev_packet_size; // 지난번 recv에서 완성되지 않아서 저장해 놓은 패킷의 앞부분의 크기
+	char m_packet[MAX_PACKET_SIZE];
+
+	Client()
 	{
-		int err_num = WSAGetLastError();
-		if (WSA_IO_PENDING != err_num)
-			err_display("Error in SendPacket : ");
+		m_isconnected = false;
+		m_x = 4;
+		m_y = 4;
+
+		ZeroMemory(&m_rxover.m_over, sizeof(WSAOVERLAPPED));
+		m_rxover.m_wsabuf.buf = m_rxover.m_iobuf;
+		m_rxover.m_wsabuf.len = sizeof(m_rxover.m_wsabuf.buf);
+		m_rxover.event_type = false;
+		m_prev_packet_size = 0;
 	}
-}
+};
 
-static void DisCountPlayer(int key)
+class CFramework
 {
-	closesocket(g_clients[key].s);
-	g_clients[key].in_use = false;
-	std::cout << "client [" << key << "] DisCount\n";
+private:
 
-	sc_packet_remove_player p;
-	p.id = key;
-	p.size = sizeof(p);
-	p.type = SC_REMOVE_PLAYER;
+public:
+	void SendPacket(int id, void *ptr);
+	void ProcessPacket(int id, char *ptr);
 
-	for (auto id : g_clients[key].viewlist) {
-		if (g_clients[id].in_use == true) {
-			if (g_clients[id].viewlist.count(key)) {
-				g_clients[id].viewlist.erase(key);
-				SendPacket(id, &p);
-			}
-		}
-	}
-	g_clients[key].viewlist.clear();
-}
-
-
-namespace Util
-{
-	void LindedSetData(char serial_num, SOCKET &sock);
-	void ProcessPacket(char serial_num, char *data);
-	void KeyInput(char serial_num, char *packet);
-}
+	bool CanSee(int a, int b);
+	void DisconnectPlayer(int id);
+public:
+	void StartRecv(int id);
+	
+	void SendPutObjectPacket(int client, int object);
+	void SendRemoveObjectPacket(int client, int object);
+	
+};
