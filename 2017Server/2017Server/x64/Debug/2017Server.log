@@ -1,0 +1,14 @@
+﻿  server_main.cpp
+c:\users\kkod\desktop\iocpclass\2017server\2017server\server_main.cpp(115): warning C4244: '초기화 중': 'lua_Number'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\kkod\desktop\iocpclass\2017server\2017server\server_main.cpp(123): warning C4244: '초기화 중': 'lua_Number'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\kkod\desktop\iocpclass\2017server\2017server\server_main.cpp(131): warning C4244: '초기화 중': 'lua_Number'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\kkod\desktop\iocpclass\2017server\2017server\server_main.cpp(132): warning C4244: '초기화 중': 'lua_Number'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\kkod\desktop\iocpclass\2017server\2017server\server_main.cpp(291): warning C4996: 'wcscpy': This function or variable may be unsafe. Consider using wcscpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.10240.0\ucrt\corecrt_wstring.h(121): note: 'wcscpy' 선언을 참조하십시오.
+c:\users\kkod\desktop\iocpclass\2017server\2017server\server_main.cpp(504): warning C4244: '인수': 'unsigned __int64'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\kkod\desktop\iocpclass\2017server\2017server\server_main.cpp(509): warning C4244: '인수': 'unsigned __int64'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\kkod\desktop\iocpclass\2017server\2017server\server_main.cpp(552): warning C4244: '인수': 'unsigned __int64'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\kkod\desktop\iocpclass\2017server\2017server\server_main.cpp(663): warning C4244: '초기화 중': '__int64'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+LINK : warning LNK4098: 'LIBCMT' defaultlib가 다른 라이브러리와 충돌합니다. /NODEFAULTLIB:library를 사용하십시오.
+  2017Server.vcxproj -> C:\Users\KKOD\Desktop\IOCPCLASS\2017Server\x64\Debug\2017Server.exe
+  2017Server.vcxproj -> C:\Users\KKOD\Desktop\IOCPCLASS\2017Server\x64\Debug\2017Server.pdb (Full PDB)
